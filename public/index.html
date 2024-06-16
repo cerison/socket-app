@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Socket.IO Chat</title>
+    <style>
+        ul { list-style-type: none; margin: 0; padding: 0; }
+        li { padding: 8px; margin-bottom: 4px; background: #eee; }
+        input { padding: 8px; width: 80%; }
+        button { padding: 8px; }
+    </style>
+</head>
+<body>
+    <ul id="messages"></ul>
+    <input id="m" autocomplete="off" /><button>Send</button>
+
+    <script src="https://cdn.socket.io/4.0.0/socket.io.min.js"></script>
+    <script>
+        var socket = io();
+
+        // Send message when button is clicked
+        document.querySelector('button').addEventListener('click', function() {
+            var input = document.getElementById('m');
+            var message = input.value;
+            if (message.trim()) {
+                socket.emit('chat message', message);
+                input.value = '';
+            }
+        });
+
+        // Listen for 'chat message' events from the server
+        socket.on('chat message', function(msg) {
+            var item = document.createElement('li');
+            item.textContent = msg;
+            document.getElementById('messages').appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        });
+
+        // Automatically send 'hi' message when connected
+        socket.on('connect', function() {
+            socket.emit('chat message', 'hi');
+        });
+    </script>
+</body>
+</html>
